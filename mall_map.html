@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.js"></script>
+    <script src="https://unpkg.com/@antv/data-set"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/4.3.0-rc.2/echarts-en.min.js"></script>
+    <title>自定义地图底图</title>
+</head>
+<body>
+    <div id="mall_map" class="mall_map"></div>
+</body>
+</html>
+<script type="text/javascript">
+$.getJSON('http://testcdn.zhimatech.com/map.json',function(value) {
+    let map = {}
+    map = value
+    var ds = new DataSet();
+    let shop_center_point_arr = {}
+    var worldMap = ds.createView().source(map, {
+        type: 'GeoJSON'
+    }).transform({
+        type: 'map',
+        callback: function callback(row) {
+            let t_key = row.name
+            let obj = {};
+            shop_center_point_arr[t_key] = [row.centroidX,row.centroidY]
+            return row;
+        }
+    })
+echarts.dispose(document.getElementById("mall_map"));
+var myChart = echarts.init(document.getElementById("mall_map"));
+echarts.registerMap('mallMap', map);
+    var linkArr =[
+        {
+            coords:[shop_center_point_arr['汉堡王'],shop_center_point_arr['星巴克']],
+            lineStyle: {
+                type:'dashed',
+                width: 2,
+                opacity: 1,
+                curveness: 0.3,
+                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                        offset: 0, color: '#0DFDF2'
+                    }, {
+                        offset: 1, color: '#017DFF'
+                    }], false),
+            }
+        },
+        {
+            coords:[shop_center_point_arr['星巴克'],shop_center_point_arr['万达影城']],
+            lineStyle: {
+                type:'dashed',
+                width: 2,
+                opacity: 1,
+                curveness: 0.3,
+                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                        offset: 0, color: '#0DFDF2'
+                    }, {
+                        offset: 1, color: '#017DFF'
+                    }], false),
+            }
+        },
+        {
+            coords:[shop_center_point_arr['万达影城'],shop_center_point_arr['HM']],
+            lineStyle: {
+                type:'dashed',
+                width: 2,
+                opacity: 1,
+                curveness: 0.3,
+                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                        offset: 0, color: '#0DFDF2'
+                    }, {
+                        offset: 1, color: '#017DFF'
+                    }], false),
+            }
+        },
+        {
+            coords:[shop_center_point_arr['HM'],shop_center_point_arr['屈臣氏']],
+            lineStyle: {
+                type:'dashed',
+                width: 2,
+                opacity: 1,
+                curveness: 0.3,
+                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                        offset: 0, color: '#0DFDF2'
+                    }, {
+                        offset: 1, color: '#017DFF'
+                    }], false),
+            }
+        },
+        {
+            coords:[shop_center_point_arr['HM'],shop_center_point_arr['屈臣氏']],
+            lineStyle: {
+                type:'dashed',
+                width: 2,
+                opacity: 1,
+                curveness: 0.3,
+                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                        offset: 0, color: '#0DFDF2'
+                    }, {
+                        offset: 1, color: '#017DFF'
+                    }], false),
+            }
+        },
+        {
+            coords:[shop_center_point_arr['屈臣氏'],shop_center_point_arr['汉堡王']],
+            lineStyle: {
+                type:'dashed',
+                width: 2,
+                opacity: 1,
+                curveness: 0.3,
+                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                        offset: 0, color: '#0DFDF2'
+                    }, {
+                        offset: 1, color: '#017DFF'
+                    }], false),
+            }
+        },
+    ]
+
+var option = {
+    title:{
+        show:false
+    },
+    tooltip:{
+        trigger: 'item',
+        
+    },
+    geo: {
+        map: 'mallMap',
+        roam:true,
+        zlevel:-1,
+        label:{
+            normal:{
+                show:true,
+                color:'#ffffff',
+            },
+            emphasis:{
+                color:'#ffffff',
+            }
+        },
+        itemStyle:{
+            normal:{
+                shadowColor: 'rgba(1, 125, 255, 0.5)',
+                shadowBlur: 1,
+                areaColor: '#092449',
+                color: '#017DFF',
+                borderColor:'#017DFF',
+                borderWidth:2
+            },
+            emphasis:{
+                shadowColor: 'rgba(1, 125, 255, 0.5)',
+                shadowBlur: 1,
+                areaColor: '#092449',
+                color: '#017DFF',
+                borderColor:'#017DFF',
+                borderWidth:2
+            },
+            textFixed: {
+                Alaska: [20, -20]
+            },
+        },
+        regions:[]
+    },
+    series:[
+        {
+            type: 'lines',
+            coordinateSystem:'geo',
+            zlevel: 3,
+            polyline:false,
+            symbol: ['none',
+                'arrow'
+            ],
+            //线特效配置
+            effect: {
+                show: true,
+                period: 2,
+                trailLength: 0.1,
+                // symbol: 'circle', //标记类型
+                symbol:'pin',
+                loop:true,
+                symbolSize: 15
+            },
+            data:linkArr
+        },
+        {
+            name: '商铺',
+            type: 'scatter',
+            coordinateSystem: 'geo',
+            zlevel: 10,
+            label: {
+                normal: {
+                    show: false,
+                }
+            },
+            symbol:'circle',
+            symbolSize: 25,
+            data:[],
+        }
+	]
+    }
+    myChart.setOption(option)
+    var pointArr = ['汉堡王','星巴克','万达影城','HM','屈臣氏']
+})
+
+</script>
+<style type="text/css">
+.mall_map{
+    width: 600px;
+    height: 600px;
+    background-color: #12192c;
+}
+</style>
